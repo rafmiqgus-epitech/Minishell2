@@ -9,6 +9,7 @@
     #define EXEC_H_
 
     #include "shell.h"
+    #include "parser.h"
     #include <stdbool.h>
 
 enum shell_status {
@@ -16,8 +17,15 @@ enum shell_status {
     SHELL_CONTINUE,
 };
 
+typedef struct {
+    int prev_read;
+    int fds[2];
+} pipe_ctx_t;
+
 enum shell_status run_command(shell_t *shell, char *input_buf);
+bool apply_redirections(command_t *cmd);
 int run_external(shell_t *shell, char **argv);
+void exec_external(shell_t *shell, char **argv);
 bool contains_slash(const char *str);
 char *find_path_value(char **env);
 char *build_exec_path(char **env, char *exe);

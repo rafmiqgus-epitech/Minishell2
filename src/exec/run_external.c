@@ -5,10 +5,10 @@
 ** fork/execve/wait + status propagation
 */
 
-#include "../../include/shell.h"
-#include "../../include/mysh.h"
-#include "../../include/my.h"
-#include "../../include/exec.h"
+#include "shell.h"
+#include "mysh.h"
+#include "my.h"
+#include "exec.h"
 
 #include <errno.h>
 #include <signal.h>
@@ -90,6 +90,23 @@ static int spawn_and_wait(shell_t *shell, char *exe_path,
     shell->last_status = handle_child_status(code);
     free(exe_path);
     return SUCCESS_EXIT;
+}
+
+void exec_external(shell_t *shell, char **argv)
+{
+    bool from_path = !contains_slash(argv[0]);
+    char *exe_path = build_exec_path(shell->env, argv[0]);
+
+    if (from_path && find_path_value(shell->env) == NULL)
+        print_path_not_set();
+    if (validate_exec_target(argv[0], exe_path, from_path) != SUCCESS_EXIT) {
+        free(exe_path);
+        exit(FAILURE_EXIT);
+    }
+    execve(exe_path, argv, shell->env);
+    print_execve_error(argv[0], errno);
+    free(exe_path);
+    exit(FAILURE_EXIT);
 }
 
 int run_external(shell_t *shell, char **argv)

@@ -14,28 +14,46 @@ SRCS = $(SRCS_DIR)/main.c \
 	   $(SRCS_DIR)/exec/run_command.c \
 	   $(SRCS_DIR)/exec/resolve_path.c \
 	   $(SRCS_DIR)/exec/run_external.c \
+	   $(SRCS_DIR)/exec/redirections.c \
 	   $(SRCS_DIR)/env/pwd.c \
 	   $(SRCS_DIR)/shell/loop.c \
-	   $(SRCS_DIR)/shell/init.c
+	   $(SRCS_DIR)/shell/init.c \
+	   $(SRCS_DIR)/parser/tokenize.c \
+	   $(SRCS_DIR)/parser/parse_command.c \
+	   $(SRCS_DIR)/parser/parse_utils.c \
+	   $(SRCS_DIR)/parser/parse_create.c \
+	   $(SRCS_DIR)/parser/parse_append.c \
+	   $(SRCS_DIR)/parser/parse_free.c
 
-OBJS_DIR = obj
+BUILD_DIR = build
+OBJS_DIR = $(BUILD_DIR)/obj
+DEPS_DIR = $(BUILD_DIR)/dep
+BIN_DIR = $(BUILD_DIR)/bin
+TARGET = $(BIN_DIR)/$(NAME)
 OBJS = $(SRCS:$(SRCS_DIR)/%.c=$(OBJS_DIR)/%.o)
+DEPS = $(SRCS:$(SRCS_DIR)/%.c=$(DEPS_DIR)/%.d)
 
 LIB_DIR = lib/my
 LIB = libmy.a
 
 all: $(NAME)
 
-$(NAME): $(LIB) $(OBJS)
-	$(CC) -o $(NAME) $(OBJS) $(LDFLAGS)
+$(NAME): $(TARGET)
+	ln -sf $(TARGET) $(NAME)
+
+$(TARGET): $(LIB) $(OBJS)
+	@mkdir -p $(BIN_DIR)
+	$(CC) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 $(LIB):
 	$(MAKE) -C $(LIB_DIR)
 
+
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c include/*.h
-	@mkdir -p $(OBJS_DIR)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(dir $(DEPS_DIR)/$*.d)
+	$(CC) $(CFLAGS) -MMD -MP -MF $(DEPS_DIR)/$*.d -MT $@ -c $< -o $@
+
 
 clean:
 	rm -rf $(OBJS_DIR)
@@ -50,5 +68,9 @@ re: fclean all
 tests_run: all
 	$(MAKE) -C tests re
 	./tests/mysh_tests
+
+compdb:
+	@mkdir -p $(BUILD_DIR)
+	bear --output $(BUILD_DIR)/compile_commands.json -- $(MAKE) -B $(OBJS)
 
 .PHONY: all clean fclean re tests_run
