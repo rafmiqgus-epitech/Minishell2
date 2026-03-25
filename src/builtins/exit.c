@@ -5,8 +5,8 @@
 ** exit command
 */
 
-#include "../../include/builtins.h"
-#include "../../include/mysh.h"
+#include "builtins.h"
+#include "mysh.h"
 
 int shell_exit(__attribute__((unused)) shell_t *shell,
     __attribute__((unused)) char **argv)

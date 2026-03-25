@@ -5,9 +5,9 @@
 ** external command path resolution helpers
 */
 
-#include "../../include/exec.h"
-#include "../../include/my.h"
-#include "../../include/mysh.h"
+#include "exec.h"
+#include "my.h"
+#include "mysh.h"
 
 #include <stdlib.h>
 #include <sys/stat.h>

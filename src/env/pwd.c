@@ -5,9 +5,9 @@
 ** env helpers for PWD/OLDPWD sync
 */
 
-#include "../../include/env.h"
-#include "../../include/mysh.h"
-#include "../../include/my.h"
+#include "env.h"
+#include "mysh.h"
+#include "my.h"
 
 #include <stdlib.h>
 

@@ -5,10 +5,10 @@
 ** prompt/read/parse/execute loop
 */
 
-#include "../../include/mysh.h"
-#include "../../include/my.h"
-#include "../../include/exec.h"
-#include "../../include/shell.h"
+#include "mysh.h"
+#include "my.h"
+#include "exec.h"
+#include "shell.h"
 
 #include <stddef.h>
 #include <stdio.h>

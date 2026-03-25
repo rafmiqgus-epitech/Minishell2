@@ -5,9 +5,9 @@
 ** map argv[0] -> builtin function
 */
 
-#include "../../include/builtins.h"
-#include "../../include/my.h"
-#include "../../include/shell.h"
+#include "builtins.h"
+#include "my.h"
+#include "shell.h"
 
 #include <stddef.h>
 #include <stdbool.h>

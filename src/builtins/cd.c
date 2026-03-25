@@ -5,10 +5,10 @@
 ** cd replica
 */
 
-#include "../../include/builtins.h"
-#include "../../include/env.h"
-#include "../../include/mysh.h"
-#include "../../include/my.h"
+#include "builtins.h"
+#include "env.h"
+#include "mysh.h"
+#include "my.h"
 
 #include <stdio.h>
 #include <stdlib.h>

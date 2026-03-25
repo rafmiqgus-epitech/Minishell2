@@ -5,9 +5,9 @@
 ** initialize shell state
 */
 
-#include "../../include/shell.h"
-#include "../../include/mysh.h"
-#include "../../include/my.h"
+#include "shell.h"
+#include "mysh.h"
+#include "my.h"
 
 #include <stdbool.h>
 #include <unistd.h>

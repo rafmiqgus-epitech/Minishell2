@@ -5,10 +5,10 @@
 ** setenv replica
 */
 
-#include "../../include/builtins.h"
-#include "../../include/mysh.h"
-#include "../../include/env.h"
-#include "../../include/my.h"
+#include "builtins.h"
+#include "mysh.h"
+#include "env.h"
+#include "my.h"
 
 #include <stdlib.h>
 

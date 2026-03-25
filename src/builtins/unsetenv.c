@@ -5,10 +5,10 @@
 ** unsetenv replica
 */
 
-#include "../../include/builtins.h"
-#include "../../include/mysh.h"
-#include "../../include/my.h"
-#include "../../include/env.h"
+#include "builtins.h"
+#include "mysh.h"
+#include "my.h"
+#include "env.h"
 
 #include <stdlib.h>
 
