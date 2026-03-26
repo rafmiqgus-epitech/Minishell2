@@ -56,8 +56,11 @@ static parse_status_t handle_semi(parse_ctx_t *ctx)
 
     if (ctx->pending_redir != REDIR_NONE)
         return PARSE_ERR_SYNTAX;
-    if (ctx->current_cmd->argv == NULL && ctx->current_grp->pipeline == NULL)
-        return PARSE_ERR_SYNTAX;
+    if (ctx->current_cmd->argv == NULL && ctx->current_grp->pipeline == NULL) {
+        if (ctx->current_grp == ctx->groups)
+            return PARSE_ERR_SYNTAX;
+        return PARSE_OK;
+    }
     append_cmd_to_grp_pipeline(ctx->current_cmd, ctx->current_grp);
     append_grp_to_grp_list(ctx->current_grp, ctx->groups);
     new_grp = create_group();
