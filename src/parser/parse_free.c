@@ -15,9 +15,28 @@ void free_tokens(token_t *tokens)
 
     for (token_t *current = tokens; current != NULL; current = next) {
         next = current->next;
-        free(current->value);
         free(current);
     }
+}
+
+static void free_redirs(redir_t *redirs)
+{
+    redir_t *next = NULL;
+
+    for (redir_t *r = redirs; r != NULL; r = next) {
+        next = r->next;
+        free(r->target);
+        free(r);
+    }
+}
+
+static void free_argv(char **argv)
+{
+    if (argv == NULL)
+        return;
+    for (size_t i = 0; argv[i] != NULL; i++)
+        free(argv[i]);
+    free(argv);
 }
 
 void free_command_groups(command_group_t *groups)
@@ -29,7 +48,8 @@ void free_command_groups(command_group_t *groups)
         next_grp = grp->next;
         for (command_t *cmd = grp->pipeline; cmd != NULL; cmd = next_cmd) {
             next_cmd = cmd->next;
-            free(cmd->argv);
+            free_argv(cmd->argv);
+            free_redirs(cmd->redirs);
             free(cmd);
         }
         free(grp);

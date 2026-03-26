@@ -43,26 +43,51 @@ static void handle_chile_piped(shell_t *shell, command_t *command,
         close(ctx->fds[1]);
     }
     run_single(shell, command, should_exit, true);
+    exit(shell->last_status);
+}
+
+static void close_ctx_fds(pipe_ctx_t *ctx)
+{
+    if (ctx->fds[0] != -1)
+        close(ctx->fds[0]);
+    if (ctx->fds[1] != -1)
+        close(ctx->fds[1]);
+    if (ctx->prev_read != -1)
+        close(ctx->prev_read);
+}
+
+static bool spawn_piped(shell_t *shell, command_t *current,
+    bool *should_exit, pipe_ctx_t *ctx)
+{
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        close_ctx_fds(ctx);
+        return false;
+    }
+    if (pid == 0)
+        handle_chile_piped(shell, current, should_exit, ctx);
+    if (ctx->fds[1] != -1)
+        close(ctx->fds[1]);
+    if (ctx->prev_read != -1)
+        close(ctx->prev_read);
+    ctx->prev_read = ctx->fds[0];
+    return true;
 }
 
 static void run_piped(shell_t *shell, command_t *pipeline, bool *should_exit)
 {
     pipe_ctx_t ctx = {-1, {-1, -1}};
-    pid_t pid;
     int status = 0;
 
     for (command_t *current = pipeline; current != NULL;
         current = current->next) {
-        if (current->next != NULL && pipe(ctx.fds) < 0)
+        if (current->next != NULL && pipe(ctx.fds) < 0) {
+            close_ctx_fds(&ctx);
             return;
-        pid = fork();
-        if (pid == 0) {
-            handle_chile_piped(shell, current, should_exit, &ctx);
-        } else {
-            close(ctx.fds[1]);
-            close(ctx.prev_read);
-            ctx.prev_read = ctx.fds[0];
         }
+        if (!spawn_piped(shell, current, should_exit, &ctx))
+            return;
     }
     while (waitpid(-1, &status, 0) > 0);
     shell->last_status = WEXITSTATUS(status);
@@ -93,21 +118,34 @@ static enum shell_status run_groups(shell_t *shell, command_group_t *groups)
     return SHELL_CONTINUE;
 }
 
-enum shell_status run_command(shell_t *shell, char *input_buf)
+static enum shell_status handle_parse_error(shell_t *shell,
+    parse_status_t status, command_group_t *groups)
 {
-    token_t *tokens = tokenize_input(input_buf);
-    command_group_t *groups = NULL;
-    parse_status_t status = PARSE_OK;
-
-    if (tokens == NULL)
-        perror("malloc(tokenization)");
-    status = parse_command_groups(tokens, &groups);
+    free_command_groups(groups);
     if (status == PARSE_ERR_SYNTAX) {
         print_error("Invalid null command.\n");
         shell->last_status = 1;
         return SHELL_CONTINUE;
     }
-    if (status == PARSE_ERR_FATAL)
+    return SHELL_EXIT;
+}
+
+enum shell_status run_command(shell_t *shell, char *input_buf)
+{
+    token_t *tokens = tokenize_input(input_buf);
+    command_group_t *groups = NULL;
+    parse_status_t status = PARSE_OK;
+    enum shell_status result = SHELL_CONTINUE;
+
+    if (tokens == NULL) {
+        perror("malloc(tokenization)");
         return SHELL_EXIT;
-    return run_groups(shell, groups);
+    }
+    status = parse_command_groups(tokens, &groups);
+    free_tokens(tokens);
+    if (status != PARSE_OK)
+        return handle_parse_error(shell, status, groups);
+    result = run_groups(shell, groups);
+    free_command_groups(groups);
+    return result;
 }
