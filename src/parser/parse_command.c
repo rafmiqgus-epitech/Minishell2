@@ -101,7 +101,8 @@ static parse_status_t finalize_parsing(parse_ctx_t *ctx)
     if (ctx->current_cmd->argv == NULL && ctx->current_grp->pipeline == NULL)
         return PARSE_OK;
     append_cmd_to_grp_pipeline(ctx->current_cmd, ctx->current_grp);
-    append_grp_to_grp_list(ctx->current_grp, ctx->groups);
+    if (ctx->current_grp != ctx->groups)
+        append_grp_to_grp_list(ctx->current_grp, ctx->groups);
     return PARSE_OK;
 }
 

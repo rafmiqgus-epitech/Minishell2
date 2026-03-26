@@ -93,7 +93,7 @@ static bool read_word(char *line, size_t *cursor, token_t **head)
     size_t start = *cursor;
     char *word = NULL;
 
-    while (!is_in_char(line[*cursor], " \t\n\0<>;|"))
+    while (line[*cursor] != '\0' && !is_in_char(line[*cursor], " \t\n<>;|"))
         ++(*cursor);
     word = word_dup(line, start, *cursor);
     if (word == NULL)
@@ -108,7 +108,7 @@ static bool read_next_token(char *line, size_t *cursor, token_t **head)
     parse_status_t status = PARSE_ERR_SYNTAX;
 
     skip_whitespaces(line, cursor);
-    if (is_in_char(line[*cursor], "\n\0"))
+    if (line[*cursor] == '\0' || line[*cursor] == '\n')
         return true;
     status = read_operator(line, cursor, head);
     if (status == PARSE_ERR_FATAL)
@@ -123,7 +123,7 @@ token_t *tokenize_input(char *line)
     token_t *head = NULL;
     size_t cursor = 0;
 
-    while (!is_in_char(line[cursor], "\0\n")) {
+    while (line[cursor] != '\0' && line[cursor] != '\n') {
         if (!read_next_token(line, &cursor, &head)) {
             free_tokens(head);
             return NULL;
