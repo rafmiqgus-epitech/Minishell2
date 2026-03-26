@@ -55,6 +55,7 @@ typedef struct s_token {
 typedef struct s_redir {
     redir_type_t type;
     char *target;
+    int read_fd;
     struct s_redir *next;
 } redir_t;
 

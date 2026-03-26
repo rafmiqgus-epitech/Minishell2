@@ -40,6 +40,7 @@ redir_t *create_redir(redir_type_t type, char *target)
         return NULL;
     redir->type = type;
     redir->target = target;
+    redir->read_fd = -1;
     redir->next = NULL;
     return redir;
 }

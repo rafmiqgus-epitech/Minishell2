@@ -101,9 +101,11 @@ static void run_pipeline(shell_t *shell, command_t *pipeline, bool *should_exit)
     }
     if (pipeline->next == NULL && pipeline->redirs == NULL) {
         run_single(shell, pipeline, should_exit, false);
-    } else {
-        run_piped(shell, pipeline, should_exit);
+        return;
     }
+    if (!prepare_heredocs(pipeline))
+        return;
+    run_piped(shell, pipeline, should_exit);
 }
 
 static enum shell_status run_groups(shell_t *shell, command_group_t *groups)

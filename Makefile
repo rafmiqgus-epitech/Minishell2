@@ -15,6 +15,7 @@ SRCS = $(SRCS_DIR)/main.c \
 	   $(SRCS_DIR)/exec/resolve_path.c \
 	   $(SRCS_DIR)/exec/run_external.c \
 	   $(SRCS_DIR)/exec/redirections.c \
+	   $(SRCS_DIR)/exec/heredoc.c \
 	   $(SRCS_DIR)/env/pwd.c \
 	   $(SRCS_DIR)/shell/loop.c \
 	   $(SRCS_DIR)/shell/init.c \

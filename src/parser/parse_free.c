@@ -6,6 +6,7 @@
 */
 
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "parser.h"
 
@@ -25,6 +26,8 @@ static void free_redirs(redir_t *redirs)
 
     for (redir_t *r = redirs; r != NULL; r = next) {
         next = r->next;
+        if (r->read_fd >= 0)
+            close(r->read_fd);
         free(r->target);
         free(r);
     }

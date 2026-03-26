@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include "my.h"
+#include "exec.h"
 #include "parser.h"
 
 static int open_redir(redir_t *redir)
@@ -43,12 +44,17 @@ static bool apply_redir(redir_t *redir)
     return true;
 }
 
+static bool apply_one(redir_t *r)
+{
+    if (r->type == REDIR_HEREDOC)
+        return apply_heredoc(r);
+    return apply_redir(r);
+}
+
 bool apply_redirections(command_t *cmd)
 {
     for (redir_t *r = cmd->redirs; r != NULL; r = r->next) {
-        if (r->type == REDIR_HEREDOC)
-            continue;
-        if (!apply_redir(r))
+        if (!apply_one(r))
             return false;
     }
     return true;

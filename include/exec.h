@@ -24,6 +24,8 @@ typedef struct {
 
 enum shell_status run_command(shell_t *shell, char *input_buf);
 bool apply_redirections(command_t *cmd);
+bool apply_heredoc(redir_t *redir);
+bool prepare_heredocs(command_t *pipeline);
 int run_external(shell_t *shell, char **argv);
 void exec_external(shell_t *shell, char **argv);
 bool contains_slash(const char *str);
