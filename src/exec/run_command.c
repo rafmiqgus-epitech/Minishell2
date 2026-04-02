@@ -139,10 +139,8 @@ enum shell_status run_command(shell_t *shell, char *input_buf)
     parse_status_t status = PARSE_OK;
     enum shell_status result = SHELL_CONTINUE;
 
-    if (tokens == NULL) {
-        perror("malloc(tokenization)");
-        return SHELL_EXIT;
-    }
+    if (tokens == NULL)
+        return SHELL_CONTINUE;
     status = parse_command_groups(tokens, &groups);
     free_tokens(tokens);
     if (status != PARSE_OK)
